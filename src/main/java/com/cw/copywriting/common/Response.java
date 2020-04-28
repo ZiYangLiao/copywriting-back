@@ -1,36 +1,43 @@
 package com.cw.copywriting.common;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
 public class Response<T> {
-    private final Integer code = 200;
-    private final String msg = "success";
-    private final T data = null;
+    private Integer code = 200;
+    private String msg = "success";
+    private T data = null;
 
 
     private Response(T data2) {
         this.of(200, "success", data2);
     }
 
+    private Response(Integer code, String msg) {
+        this.code = code;
+        this.msg = msg;
+    }
+
+    private Response(Integer code, String msg, T data) {
+        this.code = code;
+        this.msg = msg;
+        this.data = data;
+    }
+
     public static <T> Response<T> of(T data) {
         return new Response<>(data);
     }
 
-    public static <T> Response<T> of(Integer code,String msg) {
-        return new Response<>(code,msg,null);
+    public static <T> Response<T> of(Integer code, String msg) {
+        return new Response(code, msg);
     }
 
-    public static <T> Response<T> of(Integer code,String msg,T data) {
-        return new Response<>(code,msg,data);
+    public static <T> Response<T> of(Integer code, String msg, T data) {
+        return new Response(code, msg, data);
     }
 
-    public static <T>Response<T> success(){
+    public static <T> Response<T> success() {
         return new Response<>(null);
     }
-    public static <T>Response<T> fail(String msg){
+
+    public static <T> Response<T> fail(String msg) {
         return new Response<>(0, msg);
     }
 

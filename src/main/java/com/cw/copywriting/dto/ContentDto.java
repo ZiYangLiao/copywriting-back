@@ -1,6 +1,8 @@
 package com.cw.copywriting.dto;
 
-public class ContentDto {
+import com.cw.copywriting.common.PageBean;
+
+public class ContentDto extends PageBean {
 
     private int id;
 

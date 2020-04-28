@@ -18,8 +18,8 @@ public class LabelContentRelBean {
     @Column(name = "content_id")
     private int contentId;
 
-    @Column(name = "label_id")
-    private int label_id;
+    @Column(name = "labelId")
+    private int labelId;
 
     public int getId() {
         return id;
@@ -37,11 +37,11 @@ public class LabelContentRelBean {
         this.contentId = contentId;
     }
 
-    public int getLabel_id() {
-        return label_id;
+    public int getLabelId() {
+        return labelId;
     }
 
-    public void setLabel_id(int label_id) {
-        this.label_id = label_id;
+    public void setLabelId(int labelId) {
+        this.labelId = labelId;
     }
 }
