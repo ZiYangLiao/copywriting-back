@@ -4,10 +4,7 @@ import com.cw.copywriting.common.Response;
 import com.cw.copywriting.dto.ContentDto;
 import com.cw.copywriting.service.ContentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @auther Liao ziyang
@@ -21,7 +18,7 @@ public class ContentController {
     @Autowired
     private ContentService contentService;
 
-    @GetMapping(value = "/add")
+    @PostMapping(value = "/add")
     public Response<?> add(@RequestBody ContentDto content) {
         try {
             contentService.addWA(content);
@@ -31,7 +28,7 @@ public class ContentController {
         return Response.success();
     }
 
-    @GetMapping(value = "/list")
+    @GetMapping(value = "/key/search/list")
     public Response<?> list(@RequestBody ContentDto content) {
 
         return contentService.list(content);
