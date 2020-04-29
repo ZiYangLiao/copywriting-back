@@ -1,10 +1,13 @@
 package com.cw.copywriting.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cw.copywriting.bean.LabelBean;
 import com.cw.copywriting.dao.LabelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @auther Liao ziyang
@@ -18,11 +21,19 @@ public class LabelService {
     private LabelRepository labelRepository;
 
     public LabelBean save(LabelBean labelBean) {
-        return labelRepository.findOne(Example.of(labelBean)).orElseGet(() -> labelRepository.save(labelBean));
+        LabelBean label = findByLabelName(labelBean);
+        if(label == null) {
+            return labelRepository.save(labelBean);
+        }
+        return label;
     }
 
-    public LabelBean findOne(LabelBean labelBean) {
-        return labelRepository.findOne(Example.of(labelBean)).orElseGet(null);
+    public LabelBean findByLabelName(LabelBean labelBean) {
+        return labelRepository.findByLabelName(labelBean.getLabelName());
+    }
+
+    public List<LabelBean> findByLabelList(int contentId) {
+        return labelRepository.findByLabelList(contentId);
     }
 
 }

@@ -1,33 +1,27 @@
-package com.cw.copywriting.bean;
+package com.cw.copywriting.vo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import com.cw.copywriting.bean.LabelBean;
 
-import javax.persistence.*;
+import java.util.List;
 
 /**
  * @auther Liao ziyang
  * @date 2020/3/26
  * @desc
  */
-@Entity
-@Table(name = "content")
-public class ContentBean {
+public class ContentVO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "type")
     private int type;
 
-    @Column(name = "content")
     private String content;
 
-    @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "datetime")
     private String datetime;
+
+    private List<LabelBean> labelBeanList;
 
     public int getId() {
         return id;
@@ -67,5 +61,13 @@ public class ContentBean {
 
     public void setDatetime(String datetime) {
         this.datetime = datetime;
+    }
+
+    public List<LabelBean> getLabelBeanList() {
+        return labelBeanList;
+    }
+
+    public void setLabelBeanList(List<LabelBean> labelBeanList) {
+        this.labelBeanList = labelBeanList;
     }
 }

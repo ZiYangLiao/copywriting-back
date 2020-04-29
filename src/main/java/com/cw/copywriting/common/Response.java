@@ -7,7 +7,7 @@ public class Response<T> {
 
 
     private Response(T data2) {
-        this.of(200, "success", data2);
+        this.data = data2;
     }
 
     private Response(Integer code, String msg) {

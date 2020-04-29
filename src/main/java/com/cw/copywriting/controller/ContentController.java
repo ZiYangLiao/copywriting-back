@@ -29,7 +29,7 @@ public class ContentController {
     }
 
     @GetMapping(value = "/key/search/list")
-    public Response<?> list(@RequestBody ContentDto content) {
+    public Response<?> list(ContentDto content) {
 
         return contentService.list(content);
     }

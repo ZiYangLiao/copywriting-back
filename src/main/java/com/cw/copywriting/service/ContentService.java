@@ -1,5 +1,6 @@
 package com.cw.copywriting.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cw.copywriting.bean.ContentBean;
 import com.cw.copywriting.bean.LabelBean;
 import com.cw.copywriting.bean.LabelContentRelBean;
@@ -7,14 +8,16 @@ import com.cw.copywriting.common.Response;
 import com.cw.copywriting.common.utils.DateUtil;
 import com.cw.copywriting.dao.ContentRepository;
 import com.cw.copywriting.dto.ContentDto;
+import com.cw.copywriting.vo.ContentVO;
+import com.cw.copywriting.vo.PageVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @auther Liao ziyang
@@ -35,11 +38,10 @@ public class ContentService {
         if (StringUtils.isBlank(content.getContent())) {
             throw new RuntimeException("文案不能为空");
         }
-        ContentBean contentBean = new ContentBean();
-        contentBean.setContent(content.getContent());
-        contentRepository.findOne(Example.of(contentBean)).ifPresent(e -> {
+        ContentBean contentBean = contentRepository.findByContent(content.getContent().trim());
+        if (contentBean != null) {
             throw new RuntimeException("文案已重复");
-        });
+        }
         ContentBean dataObj = new ContentBean();
         BeanUtils.copyProperties(content, dataObj);
         dataObj.setDatetime(DateUtil.thisTime());
@@ -48,8 +50,11 @@ public class ContentService {
         if (StringUtils.isNotBlank(content.getLabel())) {
             String[] labels = content.getLabel().trim().split("#");
             for (String label : labels) {
+                if (StringUtils.isBlank(label)) {
+                    continue;
+                }
                 LabelBean qo = new LabelBean();
-                qo.setLabelName(label);
+                qo.setLabelName(label.trim());
                 LabelBean thisLabel = labelService.save(qo);
                 LabelContentRelBean rel = new LabelContentRelBean();
                 rel.setLabelId(thisLabel.getId());
@@ -65,16 +70,30 @@ public class ContentService {
         }
         LabelBean qo = new LabelBean();
         qo.setLabelName(content.getContent().trim());
-        LabelBean labelBean = labelService.findOne(qo);
+        LabelBean labelBean = labelService.findByLabelName(qo);
 
         PageRequest pageable = PageRequest.of(content.getPageNumber(), content.getPageSize(), Sort.Direction.DESC, "id");
         Page<ContentBean> page = null;
         if (labelBean != null) {
-            page = contentRepository.findContentAndLabelId(labelBean.getId(), "%" + content.getContent() + "%", pageable);
+            page = contentRepository.findByContentAndLabelId(labelBean.getId(), "%" + content.getContent() + "%", pageable);
         } else {
             page = contentRepository.findByContentLike("%" + content.getContent() + "%", pageable);
         }
+        System.out.println(JSONObject.toJSONString(page));
+        List<ContentVO> contentVOList  = new ArrayList<>();
+        List<ContentBean> contentBeanList  = page.getContent();
+        for (ContentBean bean: contentBeanList) {
+            ContentVO vo = new ContentVO();
+            BeanUtils.copyProperties(bean, vo);
+            vo.setLabelBeanList(labelService.findByLabelList(vo.getId()));
+            contentVOList.add(vo);
+        }
 
-        return Response.of(page);
+        PageVO<ContentVO> pageVO = new PageVO<>();
+        pageVO.setPageNumber(content.getPageNumber());
+        pageVO.setPageSize(content.getPageSize());
+        pageVO.setTotal(Integer.parseInt(page.getTotalElements() + ""));
+        pageVO.setData(contentVOList);
+        return Response.of(pageVO);
     }
 }

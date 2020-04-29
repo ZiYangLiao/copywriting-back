@@ -22,6 +22,6 @@ public class LabelContentRelService {
     }
 
     public LabelContentRelBean findOne(LabelContentRelBean labelContentRelBean) {
-        return labelContentRelRepository.findOne(Example.of(labelContentRelBean)).orElseGet(null);
+        return labelContentRelRepository.findOne(Example.of(labelContentRelBean)).orElse(null);
     }
 }

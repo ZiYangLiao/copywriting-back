@@ -1,5 +1,7 @@
 package com.cw.copywriting.bean;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
+
 import javax.persistence.*;
 
 /**
@@ -12,9 +14,10 @@ import javax.persistence.*;
 public class LabelBean {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Ignore
     @Column(name = "classify_id")
     private int classifyId;
 

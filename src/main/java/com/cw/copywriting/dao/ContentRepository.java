@@ -16,11 +16,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ContentRepository extends JpaRepository<ContentBean, Long> {
 
+    ContentBean findByContent(String content);
+
     Page<ContentBean> findByContentLike(String content, Pageable pageable);
 
-    @Query(value = "SELECT DISTINCT c.id,c.content FROM ContentBean c " +
+    @Query(value = "SELECT DISTINCT c.* FROM content c " +
             "where c.id in " +
-            "(SELECT lcr.contentId from LabelContentRelBean lcr where lcr.labelId = :labelId) " +
-            " or c.content LIKE :content")
-    Page<ContentBean> findContentAndLabelId(@Param(value = "labelId") int labelId, @Param(value = "content")String content,  Pageable pageable);
+            "(SELECT lcr.content_id from label_content_rel lcr where lcr.label_id = :labelId) " +
+            " or c.content LIKE :content", nativeQuery = true)
+    Page<ContentBean> findByContentAndLabelId(@Param(value = "labelId") int labelId, @Param(value = "content")String content,  Pageable pageable);
 }
