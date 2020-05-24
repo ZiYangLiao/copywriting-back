@@ -23,12 +23,7 @@ public class PageVO<T> {
     }
 
     public void setPageNumber(int pageNumber) {
-        if (pageNumber < 0) {
-            pageNumber = (pageNumber - 1);
-        } else {
-            pageNumber = 0;
-        }
-        this.pageNumber = pageNumber;
+      this.pageNumber = pageNumber;
     }
 
     public int getPageSize() {
@@ -36,12 +31,6 @@ public class PageVO<T> {
     }
 
     public void setPageSize(int pageSize) {
-        if (pageSize < 0) {
-            pageSize = 12;
-        }
-        if (pageSize > 60) {
-            pageSize = 12;
-        }
         this.pageSize = pageSize;
     }
 

@@ -6,15 +6,19 @@ import com.cw.copywriting.bean.LabelBean;
 import com.cw.copywriting.bean.LabelContentRelBean;
 import com.cw.copywriting.common.Response;
 import com.cw.copywriting.common.utils.DateUtil;
+import com.cw.copywriting.common.utils.Html2TextUtil;
 import com.cw.copywriting.dao.ContentRepository;
 import com.cw.copywriting.dto.ContentDto;
 import com.cw.copywriting.vo.ContentVO;
 import com.cw.copywriting.vo.PageVO;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +31,8 @@ import java.util.List;
 @Service
 public class ContentService {
 
+    static Logger logger = LoggerFactory.getLogger(ContentService.class);
+
     @Autowired
     private ContentRepository contentRepository;
     @Autowired
@@ -35,9 +41,16 @@ public class ContentService {
     private LabelContentRelService labelContentRelService;
 
     public void addWA(ContentDto content) {
+
         if (StringUtils.isBlank(content.getContent())) {
             throw new RuntimeException("文案不能为空");
+        } else {
+            content.setContent(HtmlUtils.htmlEscape(content.getContent()));
+            if (StringUtils.isBlank(content.getContent())) {
+                throw new RuntimeException("文案去除HTML标签后不能为空");
+            }
         }
+        logger.info("addWA.content:" + JSONObject.toJSONString(content));
         ContentBean contentBean = contentRepository.findByContent(content.getContent().trim());
         if (contentBean != null) {
             throw new RuntimeException("文案已重复");
@@ -65,21 +78,24 @@ public class ContentService {
     }
 
     public Response<?> list(ContentDto content) {
-        if (StringUtils.isBlank(content.getContent())) {
-            return Response.fail("搜索内容不能为空");
-        }
-        LabelBean qo = new LabelBean();
-        qo.setLabelName(content.getContent().trim());
-        LabelBean labelBean = labelService.findByLabelName(qo);
-
-        PageRequest pageable = PageRequest.of(content.getPageNumber(), content.getPageSize(), Sort.Direction.DESC, "id");
         Page<ContentBean> page = null;
-        if (labelBean != null) {
-            page = contentRepository.findByContentAndLabelId(labelBean.getId(), "%" + content.getContent() + "%", pageable);
+        PageRequest pageable = PageRequest.of(content.getPageNumber(), content.getPageSize(), Sort.Direction.DESC, "id");
+        if (StringUtils.isBlank(content.getContent())) {
+            LabelBean qo = new LabelBean();
+            qo.setLabelName(content.getContent().trim());
+            LabelBean labelBean = labelService.findByLabelName(qo);
+
+            if (labelBean != null) {
+                page = contentRepository.findByContentAndLabelId(labelBean.getId(), "%" + content.getContent() + "%", pageable);
+            } else {
+                page = contentRepository.findByContentLike("%" + content.getContent() + "%", pageable);
+            }
         } else {
             page = contentRepository.findByContentLike("%" + content.getContent() + "%", pageable);
         }
+
         System.out.println(JSONObject.toJSONString(page));
+        logger.info("list.page:" + JSONObject.toJSONString(page));
         List<ContentVO> contentVOList  = new ArrayList<>();
         List<ContentBean> contentBeanList  = page.getContent();
         for (ContentBean bean: contentBeanList) {
@@ -90,8 +106,8 @@ public class ContentService {
         }
 
         PageVO<ContentVO> pageVO = new PageVO<>();
-        pageVO.setPageNumber(content.getPageNumber());
-        pageVO.setPageSize(content.getPageSize());
+        pageVO.setPageNumber(page.getNumber());
+        pageVO.setPageSize(page.getSize());
         pageVO.setTotal(Integer.parseInt(page.getTotalElements() + ""));
         pageVO.setData(contentVOList);
         return Response.of(pageVO);

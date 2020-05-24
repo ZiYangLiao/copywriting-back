@@ -19,7 +19,10 @@ public class PageBean {
     }
 
     public void setPageNumber(int pageNumber) {
-        this.pageNumber = pageNumber + 1;
+        if (pageNumber < 0) {
+            pageNumber = 0;
+        }
+        this.pageNumber = pageNumber;
     }
 
     public int getPageSize() {
@@ -27,6 +30,10 @@ public class PageBean {
     }
 
     public void setPageSize(int pageSize) {
+
+        if (pageSize > 24) {
+            pageSize = 12;
+        }
         this.pageSize = pageSize;
     }
 
