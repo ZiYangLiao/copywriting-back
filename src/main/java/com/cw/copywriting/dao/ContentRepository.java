@@ -20,9 +20,14 @@ public interface ContentRepository extends JpaRepository<ContentBean, Long> {
 
     Page<ContentBean> findByContentLike(String content, Pageable pageable);
 
-    @Query(value = "SELECT DISTINCT c.* FROM content c " +
+    @Query(value = "SELECT DISTINCT c.* FROM content as c " +
             "where c.id in " +
-            "(SELECT lcr.content_id from label_content_rel lcr where lcr.label_id = :labelId) " +
-            " or c.content LIKE :content", nativeQuery = true)
+            "(SELECT lcr.content_id from label_content_rel as lcr where lcr.label_id = :labelId) " +
+            " or c.content LIKE :content",
+            countQuery = "SELECT count(DISTINCT c.id) FROM content as c " +
+                    "where c.id in " +
+                    "(SELECT lcr.content_id from label_content_rel as lcr where lcr.label_id = :labelId) " +
+                    " or c.content LIKE :content",
+            nativeQuery = true)
     Page<ContentBean> findByContentAndLabelId(@Param(value = "labelId") int labelId, @Param(value = "content")String content,  Pageable pageable);
 }

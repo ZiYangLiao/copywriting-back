@@ -80,7 +80,7 @@ public class ContentService {
     public Response<?> list(ContentDto content) {
         Page<ContentBean> page = null;
         PageRequest pageable = PageRequest.of(content.getPageNumber(), content.getPageSize(), Sort.Direction.DESC, "id");
-        if (StringUtils.isBlank(content.getContent())) {
+        if (StringUtils.isNotBlank(content.getContent())) {
             LabelBean qo = new LabelBean();
             qo.setLabelName(content.getContent().trim());
             LabelBean labelBean = labelService.findByLabelName(qo);
