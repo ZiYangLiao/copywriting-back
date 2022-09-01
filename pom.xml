@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>org.jsoup</groupId>
 			<artifactId>jsoup</artifactId>
-			<version>1.13.1</version>
+			<version>1.15.3</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.google.collect/com.springsource.com.google.common.collect -->
 		<dependency>
